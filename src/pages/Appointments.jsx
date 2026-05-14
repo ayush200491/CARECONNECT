@@ -112,7 +112,7 @@ const Appointments = () => {
         </div>
         
         <button onClick={handleBookAppointment} className='mt-8 px-6 py-2 bg-blue-500 text-white rounded-md'>
-          Book an appointment
+          Book an appointments
         </button>
       </div>  
       {/* related Products */}
