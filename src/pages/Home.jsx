@@ -4,6 +4,7 @@ import Speciality from '../components/Speciality'
 import Topdoctors from '../components/Topdoctors'
 import Banner from '../components/Banner'
 
+
 const Home = () => {
   return (
     <div>

@@ -38,7 +38,12 @@ import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
 import logo5 from './logo5.png'
 import logo6 from './logo6.png'
-
+import Medical_Emergency from './Medical_Emergency.jpg'
+import Medical_Specialist from './Medical_Specialist.jpg'
+import Lab from './Lab.avif'
+import Health_Records_Management from './Health_Records_Management.avif'
+import Prescription_Management from './Prescription_Management.avif'
+import Second_Medical_Opinion from './Second_Medical_Opinion .jpg'
 
 export const assets = { 
     logo5,
@@ -59,7 +64,13 @@ export const assets = {
     dropdown_icon,
     upload_icon,
     stripe_logo,
-    razorpay_logo
+    razorpay_logo,
+    Medical_Emergency,
+    Medical_Specialist,
+    Lab,
+    Health_Records_Management,
+    Prescription_Management,
+    Second_Medical_Opinion,
 }
 
 export const specialityData = [

@@ -13,6 +13,7 @@ import Footer from './components/Footer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AnimatePresence, motion } from 'framer-motion';
+import Services from './pages/Services';
 
 const App = () => {
   const location = useLocation();
@@ -48,6 +49,14 @@ const App = () => {
             element={<PageTransition><Contact /></PageTransition>}
           />
           <Route
+            path='/contact'
+            element={<PageTransition><Contact /></PageTransition>}
+          />
+          <Route
+            path='/services'
+            element={<PageTransition><Services /></PageTransition>}
+          />
+          <Route
             path='/my-profile'
             element={<PageTransition><Myprofile /></PageTransition>}
           />
@@ -59,6 +68,7 @@ const App = () => {
             path='/appointments/:docId'
             element={<PageTransition><Appointments /></PageTransition>}
           />
+         
         </Routes>
       </AnimatePresence>
       <Footer />

@@ -1,17 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext.jsx'
+import { toast } from 'react-toastify'
+
+const compressImage = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onerror = () => reject(new Error('Unable to read image file'))
+    reader.onload = () => {
+      const image = new Image()
+
+      image.onerror = () => reject(new Error('Unable to process image file'))
+      image.onload = () => {
+        const maxDimension = 1024
+        let { width, height } = image
+
+        if (width > height && width > maxDimension) {
+          height = Math.round((height * maxDimension) / width)
+          width = maxDimension
+        } else if (height >= width && height > maxDimension) {
+          width = Math.round((width * maxDimension) / height)
+          height = maxDimension
+        }
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+
+        const context = canvas.getContext('2d')
+        if (!context) {
+          reject(new Error('Unable to prepare image for upload'))
+          return
+        }
+
+        context.drawImage(image, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', 0.82))
+      }
+
+      image.src = reader.result
+    }
+
+    reader.readAsDataURL(file)
+  })
+}
 
 const Myprofile = () => {
   const [userdata, setuserdata] = useState({
-    name: "Edward Vincent",
-    email: "edward.vincent@example.com",
-    phone: "1234567890",
-    address: "123 Main St",
-    birthday: "1990-01-01",
-    gender: "Male",
-    image: "src/assets/profile_pic.png",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    birthday: "",
+    gender: "",
+    image: "",
   });
 
   const [isedit, setisedit] = useState(false);
+  const { user, updateUser } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      setuserdata((prev) => ({ ...prev, ...user }))
+    }
+  }, [user])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,14 +73,29 @@ const Myprofile = () => {
   };
 
   const handleImageChange = (e) => {
-    setuserdata((prevData) => ({...prevData,image: URL.createObjectURL(e.target.files[0]),}))
+    const file = e.target.files[0]
+    if (file) {
+      const maxFileSizeBytes = 10 * 1024 * 1024
+      if (file.size > maxFileSizeBytes) {
+        toast.error('Please upload an image smaller than 10MB')
+        return
+      }
+
+      compressImage(file)
+        .then((compressedImage) => {
+          setuserdata((prevData) => ({ ...prevData, image: compressedImage }))
+        })
+        .catch((error) => {
+          toast.error(error.message || 'Failed to process the selected image')
+        })
+    }
   }
 
   return (
     <div className="max-w-lg h-full">
       <div className="mt-12">
         <label>
-          <img className="w-36 rounded-md cursor-pointer" src={userdata.image} alt="Profile" />
+          <img className="w-36 rounded-md cursor-pointer" src={userdata.image || 'https://via.placeholder.com/150'} alt="Profile" />
           {isedit && (
             <input
               type="file"
@@ -147,7 +213,20 @@ const Myprofile = () => {
           </button>
           {isedit && (
             <button
-              onClick={() => setisedit(false)}
+              onClick={async (e) => {
+                e.preventDefault()
+                try {
+                  const result = await (updateUser ? updateUser(user ? { ...user, ...userdata } : userdata) : null)
+                  if (result) {
+                    toast.success('Profile updated')
+                  } else {
+                    toast.error('Failed to update profile')
+                  }
+                } catch (e) {
+                  toast.error(e.message || 'Failed to update profile')
+                }
+                setisedit(false)
+              }}
               className="border hover:bg-blue-600 hover:text-white px-6 py-2 rounded-full border-blue-500"
             >
               Save Information

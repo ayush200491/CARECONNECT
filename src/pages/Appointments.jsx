@@ -1,16 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppContext } from '../context/Appcontext';
+import { AppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import dayjs from 'dayjs';
 import RelatedProducts from '../components/RelatedProducts';
-import { toast } from 'react-toastify';
 
 const Appointments = () => {
 
   const navigate = useNavigate()
   const { docId } = useParams();
-  const { doctors, currencySymbol ,appointments,bookAppointment} = useContext(AppContext);
+  const { doctors, currencySymbol, bookAppointment } = useContext(AppContext);
   
   const [appointment, setAppointment] = useState({});
   const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
@@ -38,19 +37,26 @@ const Appointments = () => {
     // console.log(app);
   };
 
-  const handleBookAppointment = () => {
+  const handleBookAppointment = async () => {
+    if (!selectedTime) {
+      return;
+    }
+
     const newAppointment = {
-      id: docId,
-      name: appointment.name,
+      doctorId: docId,
+      doctorName: appointment.name,
       speciality: appointment.speciality,
+      doctorImage: appointment.image,
       address: appointment.address,
       date: selectedDate,
       time: selectedTime,
-      image: appointment.image
     };
-    bookAppointment(newAppointment);
-    navigate('/my-appointments'); // Redirect to MyAppointments page
-    toast.success("Appointment booked successfully")
+
+    const result = await bookAppointment(newAppointment);
+
+    if (result) {
+      navigate('/my-appointments');
+    }
   };
 
 
@@ -112,7 +118,7 @@ const Appointments = () => {
         </div>
         
         <button onClick={handleBookAppointment} className='mt-8 px-6 py-2 bg-blue-500 text-white rounded-md'>
-          Book an appointments
+          Book an appointment
         </button>
       </div>  
       {/* related Products */}
